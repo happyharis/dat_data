@@ -1,8 +1,11 @@
-# Support Vector Machine
+# Naive Bayes
 
 # Importing the Dataset
 dataset = read.csv('Social_Network_Ads.csv')
 dataset = dataset[3:5]
+
+# Encoding the target feature as factor
+dataset$Purchased = factor(dataset$Purchased, levels = c(0,1))
 
 # Splitting the dataset into the training set and the test set
 library(caTools)
@@ -12,16 +15,14 @@ training_set = subset(dataset, split == TRUE)
 test_set = subset(dataset, split == FALSE)
 
 # Featur Scaling
-training_set[, 1:2] = scale(training_set)[, 1:2]
-test_set[, 1:2] = scale(test_set)[, 1:2]
+training_set[-3] = scale(training_set[-3])
+test_set[-3] = scale(test_set[-3])
 
 # Fitting Logisitic Regression to the Trainig set
 # install.packages('e1071')
 library(e1071)
-classifier = svm( formula = Purchased ~ .,
-                  data = training_set,
-                  type = 'C-classification',
-                  kernel = 'radial')
+classifier = naiveBayes( x = training_set[-3],
+                         y = training_set$Purchased)
 
 # Predicting the test set results
 y_pred = predict(classifier, newdata = test_set[-3])
@@ -39,7 +40,7 @@ grid_set = expand.grid(x1, x2)
 colnames(grid_set) = c('Age', 'EstimatedSalary')
 y_grid = predict(classifier, newdata = grid_set)
 plot(set[, -3],
-     main = 'SVM (Training set)',
+     main = 'Naive Bayes (Training set)',
      xlab = 'Age', ylab = 'Estimated Salary',
      xlim = range(x1), ylim = range(x2))
 contour(x1, x2, matrix(as.numeric(y_grid), length(x1), length(x2)), add = TRUE)
@@ -54,7 +55,7 @@ grid_set = expand.grid(x1, x2)
 colnames(grid_set) = c('Age', 'EstimatedSalary')
 y_grid = predict(classifier, newdata = grid_set)
 plot(set[, -3],
-     main = 'SVM (Test set)',
+     main = 'Naive Bayes (Test set)',
      xlab = 'Age', ylab = 'Estimated Salary',
      xlim = range(x1), ylim = range(x2))
 contour(x1, x2, matrix(as.numeric(y_grid), length(x1), length(x2)), add = TRUE)
